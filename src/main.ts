@@ -3,6 +3,7 @@ export * from './Clock'
 export * from './ClockController'
 export * from './Game'
 export * from './GameContainer'
+export * from './GameHolder'
 export * from './Player'
 export * from './TimeControl'
 

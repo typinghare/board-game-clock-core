@@ -2,6 +2,7 @@ import { StandardGameContainer } from '../src/standard/StandardGameContainer'
 import { StandardGameHolder } from '../src/standard/StandardGameHolder'
 import { GoByoyomiClockControllerJsonObject, GoByoyomiPlayer } from '../src/standard/game/go/GoByoyomi'
 import { SlowHourMinuteSecond } from '@typinghare/hour-minute-second'
+import { StandardGameSettings } from '../src/standard/types'
 
 describe('Standard game holder tests.', function(): void {
     const standardGameContainer = new StandardGameContainer()
@@ -25,8 +26,8 @@ describe('Standard game holder tests.', function(): void {
     })
 
     it('Test game settings.', function(): void {
-        const gameSettings = standardGameHolderJsonObject.game.settings
-        expect(gameSettings.sync).toBe(true)
+        const gameSettings = standardGameHolderJsonObject.game.settings as StandardGameSettings
+        expect(gameSettings.synchronizePlayerSettings).toBe(true)
     })
 
     it('Test players.', function(): void {

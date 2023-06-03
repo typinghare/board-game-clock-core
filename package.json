@@ -1,12 +1,13 @@
 {
   "name": "@typinghare/board-game-clock-core",
-  "version": "1.0.5",
+  "version": "1.1.0",
   "description": "Board game clock core.",
   "main": "dist/main.js",
   "types": "dist/main.d.ts",
   "author": "James Chan",
   "email": "jameschan312.cn@gmail.com",
   "scripts": {
+    "test": "jest --verbose",
     "simulate-default": "ts-node src/tool/DefaultGameSimulator.ts",
     "simulate-chess-standard": "ts-node src/standard/simulator/ChessStandardSimulator.ts",
     "simulate-go-byoyomi": "ts-node src/standard/simulator/GoByoyomiSimulator.ts",

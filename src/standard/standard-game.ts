@@ -1,5 +1,9 @@
 // Standard game container.
 export * from './StandardGameContainer'
+export * from './StandardGameHolder'
+
+// types
+export * from './types'
 
 // 1. Chess
 export * from './game/chess/ChessGame'

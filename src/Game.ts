@@ -90,6 +90,12 @@ export abstract class Game<
     protected _timeUpRole?: Role
 
     /**
+     * Roles whose clocks are running.
+     * @protected
+     */
+    protected _runningRoleArray?: Role[]
+
+    /**
      * Time control class.
      * @protected
      */
@@ -181,10 +187,60 @@ export abstract class Game<
      * Starts this game.
      */
     start(): void {
+        if (this._gameStatus !== GameStatus.PENDING) {
+            return
+        }
+
         // Initialize clock controllers for all players.
         for (const player of this._playerMap.values()) {
             player.initializeClockController()
         }
+
+        this._gameStatus = GameStatus.STARTED
+    }
+
+    // noinspection JSUnusedGlobalSymbols
+    /**
+     * Pause this game.
+     */
+    pause(): void {
+        if (this._gameStatus !== GameStatus.STARTED) {
+            return
+        }
+
+        this._gameStatus = GameStatus.PAUSED
+
+        // Record players whose clocks are running.
+        const runningRoleArray = [] as Role[]
+        for (const player of this._playerMap.values()) {
+            if (player.clockController.isClockRunning()) {
+                runningRoleArray.push(player.role)
+            }
+        }
+        this._runningRoleArray = runningRoleArray
+
+        // Pause all player's clocks.
+        for (const player of this._playerMap.values()) {
+            player.clockController.pauseClock()
+        }
+    }
+
+    // noinspection JSUnusedGlobalSymbols
+    /**
+     * Resumes this game.
+     */
+    resume(): void {
+        if (this._gameStatus !== GameStatus.PAUSED) {
+            return
+        }
+
+        // Resume.
+        if (this._runningRoleArray) {
+            for (const role of this._runningRoleArray) {
+                this.getPlayer(role).clockController.resumeClock()
+            }
+        }
+        this._runningRoleArray = undefined
 
         this._gameStatus = GameStatus.STARTED
     }
@@ -195,7 +251,7 @@ export abstract class Game<
     stop(): void {
         this._gameStatus = GameStatus.STOPPED
 
-        // Pause clock controllers for all players.
+        // Pause all player's clocks.
         for (const player of this._playerMap.values()) {
             player.clockController.pauseClock()
         }

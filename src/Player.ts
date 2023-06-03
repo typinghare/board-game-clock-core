@@ -34,7 +34,7 @@ export abstract class Player<
      * The role of this player.
      * @protected
      */
-    protected readonly _role: Role
+    private readonly _role: Role
 
     /**
      * The game creating this player.
@@ -101,18 +101,28 @@ export abstract class Player<
     }
 
     /**
-     * Return time control.
+     * Returns time control.
      */
     get timeControl(): T {
         return this._timeControl
     }
 
+    /**
+     * Returns clock controller.
+     */
     get clockController(): ClockController<TS> {
         if (this._clockController === undefined) {
             throw new ClockControllerNotInitializedException()
         }
 
         return this._clockController
+    }
+
+    /**
+     * Returns the role of this player.
+     */
+    get role(): Role {
+        return this._role
     }
 
     /**

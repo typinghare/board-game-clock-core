@@ -1,6 +1,7 @@
-import { AnyGame, Role } from '../types'
+import { Role } from '../types'
 import { HourMinuteSecond } from '@typinghare/hour-minute-second'
 import { Player } from '../Player'
+import { Game } from '../Game'
 
 const keypress = require('keypress')
 
@@ -10,36 +11,38 @@ const keypress = require('keypress')
  */
 export class GameClockSimulator {
     /**
-     * Default refresh rate.
+     * Default game refresh rate.
      * @private
      */
     private static DEFAULT_REFRESH_RATE: number = 20
 
     /**
-     * The game.
+     * The game to simulate.
      * @private
      */
-    private readonly _game: AnyGame
+    private readonly _game: Game
 
     /**
-     * The refresh rate per second.
+     * The game refresh rate (per second).
      * @private
      */
     private readonly _refreshRate: number
 
     /**
      * Creates a game simulator.
-     * @param game - Game.
-     * @param refreshRate - Refresh rate.
+     * @param game - The game to simulate.
+     * @param refreshRate - The game refresh rate.
      */
-    constructor(game: AnyGame, refreshRate: number = GameClockSimulator.DEFAULT_REFRESH_RATE) {
+    constructor(game: Game, refreshRate: number = GameClockSimulator.DEFAULT_REFRESH_RATE) {
         this._game = game
         this._refreshRate = refreshRate
     }
 
+    /**
+     * Starts simulation.
+     */
     start(): void {
         const roleArray = this._game.roleArray
-
         const firstPlayer: Player = this._game.getPlayer(roleArray[0])
         const gameClassName: string = this.getClassName(this._game)
         const timeControlClassName: string = this.getClassName(firstPlayer.timeControl)

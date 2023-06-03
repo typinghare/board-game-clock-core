@@ -7,10 +7,10 @@
   "author": "James Chan",
   "email": "jameschan312.cn@gmail.com",
   "scripts": {
-    "simulate-default": "ts-node src/simulator/DefaultGameSimulator.ts",
-    "simulate-chess-standard": "ts-node src/simulator/ChessStandardSimulator.ts",
-    "simulate-go-byoyomi": "ts-node src/simulator/GoByoyomiSimulator.ts",
-    "simulate-go-yingshi": "ts-node src/simulator/GoYingshiSimulator.ts"
+    "simulate-default": "ts-node src/tool/DefaultGameSimulator.ts",
+    "simulate-chess-standard": "ts-node src/standard/simulator/ChessStandardSimulator.ts",
+    "simulate-go-byoyomi": "ts-node src/standard/simulator/GoByoyomiSimulator.ts",
+    "simulate-go-yingshi": "ts-node src/standard/simulator/GoYingshiSimulator.ts"
   },
   "keywords": [
     "board game",

@@ -15,13 +15,17 @@ import { Game } from '../Game'
  * @author James Chan
  */
 export abstract class TwoPlayerGame<
-    G extends GameSettings,
-    T extends TimeControl<TS>,
-    P extends Player<T, TS, PA, PP>,
-    TS extends TimeControlSettings = any,
-    PA extends PlayerAttributes = any,
-    PP extends PlayerAttributeProperties = any,
+    G extends GameSettings = GameSettings,
+    T extends TimeControl<TS> = TimeControl,
+    P extends Player<T, TS, PA, PP> = Player<T>,
+    TS extends TimeControlSettings = TimeControlSettings,
+    PA extends PlayerAttributes = PlayerAttributes,
+    PP extends PlayerAttributeProperties = PlayerAttributeProperties,
 > extends Game<G, T, P, TS, PA, PP> {
+    /**
+     * Default role labels.
+     * @private
+     */
     private static DEFAULT_ROLE_ARRAY: string[] = ['A', 'B']
 
     /**

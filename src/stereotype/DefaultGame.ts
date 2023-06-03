@@ -1,10 +1,10 @@
-import { TimeControl } from '../../TimeControl'
-import { Player } from '../../Player'
-import { ClockController } from '../../ClockController'
-import { Clock } from '../../Clock'
+import { TimeControl } from '../TimeControl'
+import { Player } from '../Player'
+import { ClockController } from '../ClockController'
+import { Clock } from '../Clock'
 import { HourMinuteSecond, SlowHourMinuteSecond } from '@typinghare/hour-minute-second'
-import { TwoPlayerGame } from '../../stereotype/TwoPlayerGame'
-import { GameSettings } from '../../types'
+import { TwoPlayerGame } from './TwoPlayerGame'
+import { GameSettings } from '../types'
 
 export type DefaultGameSettings = GameSettings & {}
 

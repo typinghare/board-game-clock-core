@@ -1,5 +1,5 @@
 import { SettingContainer } from '@typinghare/settings'
-import { GameSettingProperties, TimeControlSettings } from './types'
+import { GameSettingProperties, JsonObjectEquivalent, TimeControlSettings } from './types'
 
 /**
  * Abstract time control.
@@ -8,7 +8,8 @@ import { GameSettingProperties, TimeControlSettings } from './types'
  */
 export abstract class TimeControl<
     TS extends TimeControlSettings = any
-> {
+> implements JsonObjectEquivalent<any> {
+
     /**
      * Time control settings.
      * @private
@@ -35,5 +36,22 @@ export abstract class TimeControl<
      * @protected
      */
     protected initializeSettings(): void {
+    }
+
+    toJsonObject(): object {
+        const object = {}
+        for (const [name, setting] of Object.entries(this._settings.getSettings() as object)) {
+            // @ts-ignore
+            object[name] = setting.value
+        }
+
+        return object
+    }
+
+    fromJsonObject(jsonObject: object): void {
+        for (const [name, settingValue] of Object.entries(jsonObject)) {
+            // @ts-ignore
+            this._settings.getSetting(name).value = settingValue
+        }
     }
 }

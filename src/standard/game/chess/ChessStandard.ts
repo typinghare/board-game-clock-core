@@ -1,8 +1,8 @@
 import { HourMinuteSecond, SlowHourMinuteSecond } from '@typinghare/hour-minute-second'
-import { Player } from '../../Player'
-import { TimeControl } from '../../TimeControl'
-import { ClockController } from '../../ClockController'
-import { Clock } from '../../Clock'
+import { Player } from '../../../Player'
+import { TimeControl } from '../../../TimeControl'
+import { ClockController } from '../../../ClockController'
+import { Clock } from '../../../Clock'
 
 export type ChessStandardTimeControlSettings = {
     // The main time.

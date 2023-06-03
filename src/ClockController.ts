@@ -1,15 +1,15 @@
 import { Clock } from './Clock'
 import { HourMinuteSecond } from '@typinghare/hour-minute-second'
-import { TimeControlSettings } from './types'
+import { JsonObjectEquivalent, TimeControlSettings } from './types'
 import { TimeControl } from './TimeControl'
 import { Player } from './Player'
 
 /**
- * Clock controller.
+ * Abstract clock controller.
  * @param <TS> Time control settings.
  * @author James Chan
  */
-export abstract class ClockController<TS extends TimeControlSettings = any> {
+export abstract class ClockController<TS extends TimeControlSettings = any> implements JsonObjectEquivalent<any> {
     /**
      * The player creating this clock controller.
      * @protected
@@ -17,7 +17,7 @@ export abstract class ClockController<TS extends TimeControlSettings = any> {
     protected readonly _player: Player
 
     /**
-     * Time control.
+     * The time control.
      * @protected
      */
     protected readonly _timeControl: TimeControl<TS>
@@ -39,7 +39,7 @@ export abstract class ClockController<TS extends TimeControlSettings = any> {
     }
 
     /**
-     * Initializes a clock.
+     * Initializes the clock.
      * @protected
      */
     protected abstract initializeClock(): Clock;
@@ -55,18 +55,14 @@ export abstract class ClockController<TS extends TimeControlSettings = any> {
      * Resumes the clock if the clock is not running.
      */
     resumeClock(): void {
-        if (!this.isClockRunning()) {
-            this._clock.resume()
-        }
+        this.isClockRunning() || this._clock.resume()
     }
 
     /**
      * Pauses the clock if the clock is running.
      */
     pauseClock(): void {
-        if (this.isClockRunning()) {
-            this._clock.pause()
-        }
+        this.isClockRunning() && this._clock.pause()
     }
 
     /**
@@ -74,5 +70,12 @@ export abstract class ClockController<TS extends TimeControlSettings = any> {
      */
     get clockTime(): HourMinuteSecond {
         return this._clock.time
+    }
+
+    fromJsonObject(jsonObject: any): void {
+    }
+
+    toJsonObject(): object {
+        return {}
     }
 }

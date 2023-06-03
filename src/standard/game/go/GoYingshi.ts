@@ -1,8 +1,8 @@
 import { HourMinuteSecond, SlowHourMinuteSecond } from '@typinghare/hour-minute-second'
-import { TimeControl } from '../../TimeControl'
-import { Player } from '../../Player'
-import { ClockController } from '../../ClockController'
-import { Clock } from '../../Clock'
+import { TimeControl } from '../../../TimeControl'
+import { Player } from '../../../Player'
+import { ClockController } from '../../../ClockController'
+import { Clock } from '../../../Clock'
 
 export type GoYingshiTimeControlSettings = {
     main: HourMinuteSecond,

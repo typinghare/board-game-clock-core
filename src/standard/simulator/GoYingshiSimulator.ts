@@ -1,12 +1,13 @@
-import { GoGame, GoGameSupplierMap } from '../game/go/GoGame'
 import { SlowHourMinuteSecond } from '@typinghare/hour-minute-second'
-import { GameClockSimulator } from '../tool/GameSimulator'
-import { GoYingshiPlayer, GoYingshiTimeControl } from '../game/go/GoYingshi'
+import { GameClockSimulator } from '../../tool/GameSimulator'
+import { GoYingshiPlayer } from '../game/go/GoYingshi'
+import { StandardGameContainer } from '../StandardGameContainer'
 
-const goGame = GoGameSupplierMap.Yingshi() as GoGame<GoYingshiTimeControl, GoYingshiPlayer>
+const standardGameContainer = new StandardGameContainer()
+const goGame = standardGameContainer.getGameSupplier('Go', 'Yingshi')()
 
 for (const role of goGame.roleArray) {
-    const player = goGame.getPlayer(role)
+    const player: GoYingshiPlayer = goGame.getPlayer(role)
     const settings = player.timeControl.settings
     settings.getSetting('main').value = SlowHourMinuteSecond.ofSeconds(15)
     settings.getSetting('penaltyTime').value = SlowHourMinuteSecond.ofSeconds(10)

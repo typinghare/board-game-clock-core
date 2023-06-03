@@ -15,7 +15,14 @@ import { RoleNotFoundException } from './exception/RoleNotFoundException'
 import { TimeControl } from './TimeControl'
 
 export enum GameStatus {
-    PENDING, STARTED, STOPPED
+    // The game has been created but not started.
+    PENDING = 0,
+    // The game has been started.
+    STARTED = 1,
+    // The game has been paused.
+    PAUSED = 2,
+    // The game has stopped. Note that a stopped game cannot be resumed.
+    STOPPED = 3
 }
 
 // noinspection TypeScriptAbstractClassConstructorCanBeMadeProtected
@@ -30,12 +37,12 @@ export enum GameStatus {
  * @author James Chan
  */
 export abstract class Game<
-    G extends GameSettings = any,
+    G extends GameSettings = GameSettings,
     T extends TimeControl<TS> = TimeControl,
     P extends Player<T, TS, PA, PP> = Player<T>,
-    TS extends TimeControlSettings = any,
-    PA extends PlayerAttributes = any,
-    PP extends PlayerAttributeProperties = any,
+    TS extends TimeControlSettings = TimeControlSettings,
+    PA extends PlayerAttributes = PlayerAttributes,
+    PP extends PlayerAttributeProperties = PlayerAttributeProperties,
 > {
     /**
      * Game settings.
@@ -44,7 +51,7 @@ export abstract class Game<
     protected readonly _settings = new SettingContainer<G, GameSettingProperties>()
 
     /**
-     * An array of roles.
+     * An array of role labels.
      * @private
      */
     protected readonly _roleArray: Role[]
@@ -75,7 +82,7 @@ export abstract class Game<
 
     /**
      * Creates a board game.
-     * @param roleArray - An array of roles.
+     * @param roleArray - An array of role labels.
      * @param timeControlClass - Class of creating a time control.
      * @param playerClass - Mapping of roles to players.
      * @protected

@@ -1,4 +1,10 @@
 import { HourMinuteSecond, SlowHourMinuteSecond } from '@typinghare/hour-minute-second'
+import { JsonObjectEquivalent } from './types'
+
+type ClockJsonObject = {
+    isRunning: boolean,
+    remainingTime: number
+}
 
 /**
  * A callback function being invoked when the clock's time runs out. If the return value is HourMinuteSecond, it will
@@ -21,7 +27,7 @@ export type BeforePause = (this: Clock) => void
  * the time up callback function.
  * @author James Chan
  */
-export class Clock {
+export class Clock implements JsonObjectEquivalent<ClockJsonObject> {
     /**
      * Remaining time.
      * @private
@@ -46,8 +52,16 @@ export class Clock {
      */
     private _timeoutHandle ?: NodeJS.Timeout
 
+    /**
+     * The callback function invoked before this clock being resumed.
+     * @private
+     */
     private _beforeResume ?: BeforeResume
 
+    /**
+     * The callback function invoked before this clock being paused.
+     * @private
+     */
     private _beforePause ?: BeforePause
 
     /**
@@ -58,6 +72,21 @@ export class Clock {
     constructor(initialTime: HourMinuteSecond, timeUpCallback: TimeUpCallback) {
         this._time = initialTime.clone()
         this._timeUpCallback = timeUpCallback
+    }
+
+    toJsonObject(): ClockJsonObject {
+        return {
+            isRunning: this.isRunning(),
+            remainingTime: this.time.ms,
+        }
+    }
+
+    fromJsonObject(jsonObject: ClockJsonObject): void {
+        const { isRunning, remainingTime } = jsonObject
+        this._time = new SlowHourMinuteSecond(remainingTime)
+        if (isRunning) {
+            this.resume()
+        }
     }
 
     /**
@@ -148,7 +177,7 @@ export class Clock {
     }
 
     /**
-     * Sets before resume call back function.
+     * Sets before resume callback function.
      * @param beforeResume
      */
     set beforeResume(beforeResume: BeforeResume | undefined) {

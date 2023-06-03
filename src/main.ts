@@ -14,12 +14,12 @@ export * from './exception/ClockControllerNotInitializedException'
 
 // game
 // 1. go
-export * from './game/go/GoGame'
-export * from './game/go/GoByoyomi'
-export * from './game/go/GoYingshi'
+export * from './standard/game/go/GoGame'
+export * from './standard/game/go/GoByoyomi'
+export * from './standard/game/go/GoYingshi'
 // 2. chess
-export * from './game/chess/ChessGame'
-export * from './game/chess/ChessStandard'
+export * from './standard/game/chess/ChessGame'
+export * from './standard/game/chess/ChessStandard'
 
 // stereotype
 export * from './stereotype/TwoPlayerGame'

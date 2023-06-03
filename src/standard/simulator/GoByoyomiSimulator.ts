@@ -1,12 +1,13 @@
-import { GoGame, GoGameSupplierMap } from '../game/go/GoGame'
-import { GoByoyomiPlayer, GoByoyomiTimeControl } from '../game/go/GoByoyomi'
 import { SlowHourMinuteSecond } from '@typinghare/hour-minute-second'
-import { GameClockSimulator } from '../tool/GameSimulator'
+import { GameClockSimulator } from '../../tool/GameSimulator'
+import { StandardGameContainer } from '../StandardGameContainer'
+import { GoByoyomiPlayer } from '../game/go/GoByoyomi'
 
-const goGame = GoGameSupplierMap.Byoyomi() as GoGame<GoByoyomiTimeControl, GoByoyomiPlayer>
+const standardGameContainer = new StandardGameContainer()
+const goGame = standardGameContainer.getGameSupplier('Go', 'Byoyomi')()
 
 for (const role of goGame.roleArray) {
-    const player = goGame.getPlayer(role)
+    const player: GoByoyomiPlayer = goGame.getPlayer(role)
     const settings = player.timeControl.settings
     settings.getSetting('main').value = SlowHourMinuteSecond.ofSeconds(15)
     settings.getSetting('timePerPeriod').value = SlowHourMinuteSecond.ofSeconds(10)

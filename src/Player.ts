@@ -1,9 +1,14 @@
 import { SettingContainer } from '@typinghare/settings'
-import { PlayerAttributeProperties, PlayerAttributes, Role, TimeControlSettings } from './types'
+import { JsonObjectEquivalent, PlayerAttributeProperties, PlayerAttributes, Role, TimeControlSettings } from './types'
 import { Game } from './Game'
-import { TimeControl } from './TimeControl'
-import { ClockController } from './ClockController'
+import { TimeControl, TimeControlJsonObject } from './TimeControl'
+import { ClockController, ClockControllerJsonObject } from './ClockController'
 import { ClockControllerNotInitializedException } from './exception/ClockControllerNotInitializedException'
+
+export type PlayerJsonObject = {
+    timeControl: TimeControlJsonObject,
+    clockController?: ClockControllerJsonObject
+}
 
 /**
  * Abstract board game player.
@@ -18,7 +23,7 @@ export abstract class Player<
     TS extends TimeControlSettings = any,
     PA extends PlayerAttributes = any,
     PP extends PlayerAttributeProperties = any,
-> {
+> implements JsonObjectEquivalent<PlayerJsonObject> {
     /**
      * Player attributes.
      * @private
@@ -122,5 +127,21 @@ export abstract class Player<
      */
     initializeClockController(): void {
         this._clockController = this.createClockController()
+    }
+
+    toJsonObject(): PlayerJsonObject {
+        return {
+            timeControl: this._timeControl.toJsonObject(),
+            clockController: this._clockController?.toJsonObject(),
+        }
+    }
+
+    fromJsonObject(jsonObject: PlayerJsonObject): void {
+        const { timeControl, clockController } = jsonObject
+        this._timeControl.fromJsonObject(timeControl)
+
+        if (clockController) {
+            this._clockController?.fromJsonObject(clockController)
+        }
     }
 }

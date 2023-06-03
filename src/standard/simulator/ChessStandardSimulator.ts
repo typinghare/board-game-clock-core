@@ -1,13 +1,12 @@
 import { GameClockSimulator } from '../../tool/GameSimulator'
-import { ChessStandardPlayer } from '../game/chess/ChessStandard'
 import { SlowHourMinuteSecond } from '@typinghare/hour-minute-second'
-import { StandardGameContainer } from '../StandardGameContainer'
+import { StandardGameContainer, StandardGames } from '../StandardGameContainer'
 
 const standardGameContainer = new StandardGameContainer()
-const chessGame = standardGameContainer.getGameSupplier('Chess', 'Standard')()
+const chessGame: ReturnType<StandardGames['Chess']['Standard']> = standardGameContainer.getGameSupplier('Chess', 'Standard')()
 
 for (const role of chessGame.roleArray) {
-    const player: ChessStandardPlayer = chessGame.getPlayer(role)
+    const player = chessGame.getPlayer(role)
     const settings = player.timeControl.settings
     settings.getSetting('main').value = SlowHourMinuteSecond.ofSeconds(20)
     settings.getSetting('timeIncrement').value = SlowHourMinuteSecond.ofSeconds(5)

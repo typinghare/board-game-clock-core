@@ -1,12 +1,20 @@
-import { ClockTimeUpCallback, GameSettingProperties, GameSettings, PlayerAttributeProperties, PlayerAttributes, PlayerClass, Role, TimeControlClass, TimeControlSettings } from './types';
+import { ClockTimeUpCallback, GameSettingProperties, GameSettings, JsonObjectEquivalent, PlayerAttributeProperties, PlayerAttributes, PlayerClass, Role, TimeControlClass, TimeControlSettings } from './types';
 import { SettingContainer } from '@typinghare/settings';
-import { Player } from './Player';
+import { Player, PlayerJsonObject } from './Player';
 import { TimeControl } from './TimeControl';
 export declare enum GameStatus {
     PENDING = 0,
     STARTED = 1,
-    STOPPED = 2
+    PAUSED = 2,
+    STOPPED = 3
 }
+export type GameJsonObject = {
+    settings: Record<string, any>;
+    roleArray: Role[];
+    playerArray: PlayerJsonObject[];
+    gameStatus: number;
+    timeUpRole?: Role;
+};
 /**
  * Abstract board game. We simplify "board game" to "game" in this library because "board game" is too long.
  * @param <G> - Game settings.
@@ -17,14 +25,14 @@ export declare enum GameStatus {
  * @param <PP> - Player attributes properties.
  * @author James Chan
  */
-export declare abstract class Game<G extends GameSettings = any, T extends TimeControl<TS> = TimeControl, P extends Player<T, TS, PA, PP> = Player<T>, TS extends TimeControlSettings = any, PA extends PlayerAttributes = any, PP extends PlayerAttributeProperties = any> {
+export declare abstract class Game<G extends GameSettings = GameSettings, T extends TimeControl<TS> = TimeControl, P extends Player<T, TS, PA, PP> = Player<T>, TS extends TimeControlSettings = TimeControlSettings, PA extends PlayerAttributes = PlayerAttributes, PP extends PlayerAttributeProperties = PlayerAttributeProperties> implements JsonObjectEquivalent<GameJsonObject> {
     /**
      * Game settings.
      * @private
      */
     protected readonly _settings: SettingContainer<G, GameSettingProperties<any>>;
     /**
-     * An array of roles.
+     * An array of role labels.
      * @private
      */
     protected readonly _roleArray: Role[];
@@ -49,8 +57,18 @@ export declare abstract class Game<G extends GameSettings = any, T extends TimeC
      */
     protected _timeUpRole?: Role;
     /**
+     * Time control class.
+     * @protected
+     */
+    protected _timeControlClass: TimeControlClass<T>;
+    /**
+     * Player class.
+     * @protected
+     */
+    protected _playerClass: PlayerClass<any, P>;
+    /**
      * Creates a board game.
-     * @param roleArray - An array of roles.
+     * @param roleArray - An array of role labels.
      * @param timeControlClass - Class of creating a time control.
      * @param playerClass - Mapping of roles to players.
      * @protected
@@ -110,4 +128,6 @@ export declare abstract class Game<G extends GameSettings = any, T extends TimeC
      * Returns role that runs out of time; undefined if no role runs out of time.
      */
     get timeUpRole(): Role | undefined;
+    toJsonObject(): GameJsonObject;
+    fromJsonObject(jsonObject: GameJsonObject): void;
 }

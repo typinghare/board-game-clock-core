@@ -93,7 +93,7 @@ export type GameType = string
 export type TimeControlType = string
 
 export type GameSupplier<
-    G extends GameSettings = any,
+    G extends GameSettings = GameSettings,
     T extends TimeControl<TS> = TimeControl,
     P extends Player<T, TS, PA, PP> = Player<T>,
     TS extends TimeControlSettings = any,
@@ -103,6 +103,6 @@ export type GameSupplier<
 
 export type Games<GT extends GameType> = {
     [G in GT]: {
-        [timeControl: string]: GameSupplier
+        [timeControl: string]: GameSupplier<any, any, any>
     }
 }

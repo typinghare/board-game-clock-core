@@ -1,13 +1,12 @@
 import { SlowHourMinuteSecond } from '@typinghare/hour-minute-second'
 import { GameClockSimulator } from '../../tool/GameSimulator'
-import { StandardGameContainer } from '../StandardGameContainer'
-import { GoByoyomiPlayer } from '../game/go/GoByoyomi'
+import { StandardGameContainer, StandardGames } from '../StandardGameContainer'
 
 const standardGameContainer = new StandardGameContainer()
-const goGame = standardGameContainer.getGameSupplier('Go', 'Byoyomi')()
+const goGame: ReturnType<StandardGames['Go']['Byoyomi']> = standardGameContainer.getGameSupplier('Go', 'Byoyomi')()
 
 for (const role of goGame.roleArray) {
-    const player: GoByoyomiPlayer = goGame.getPlayer(role)
+    const player = goGame.getPlayer(role)
     const settings = player.timeControl.settings
     settings.getSetting('main').value = SlowHourMinuteSecond.ofSeconds(15)
     settings.getSetting('timePerPeriod').value = SlowHourMinuteSecond.ofSeconds(10)

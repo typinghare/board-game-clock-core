@@ -18,20 +18,19 @@ Object.defineProperty(exports, "__esModule", { value: true });
 __exportStar(require("./Clock"), exports);
 __exportStar(require("./ClockController"), exports);
 __exportStar(require("./Game"), exports);
+__exportStar(require("./GameContainer"), exports);
 __exportStar(require("./Player"), exports);
 __exportStar(require("./TimeControl"), exports);
 // types
 __exportStar(require("./types"), exports);
 // exceptions
-__exportStar(require("./exception/RoleNotFoundException"), exports);
 __exportStar(require("./exception/ClockControllerNotInitializedException"), exports);
-// game
-// 1. go
-__exportStar(require("./game/go/GoGame"), exports);
-__exportStar(require("./game/go/GoByoyomi"), exports);
-__exportStar(require("./game/go/GoYingshi"), exports);
-// 2. chess
-__exportStar(require("./game/chess/ChessGame"), exports);
-__exportStar(require("./game/chess/ChessStandard"), exports);
+__exportStar(require("./exception/GameTypeNotFoundException"), exports);
+__exportStar(require("./exception/RoleNotFoundException"), exports);
+__exportStar(require("./exception/TimeControlNotFoundException"), exports);
+// standard game
+__exportStar(require("./standard/standard-game"), exports);
 // stereotype
 __exportStar(require("./stereotype/TwoPlayerGame"), exports);
+// tool
+__exportStar(require("./GameHolder"), exports);

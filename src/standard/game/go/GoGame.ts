@@ -17,8 +17,8 @@ export class GoGame<
     protected override initializeSettings(): void {
         this.settings.addSetting('sync', true, {
             type: 'bool',
-            label: 'Sync',
-            description: 'This is a description.',
+            label: 'SynchronizePlayerSettings',
+            description: 'When activated, the settings of two players will be synchronized.',
         })
     }
 }

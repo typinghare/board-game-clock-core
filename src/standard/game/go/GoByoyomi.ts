@@ -1,6 +1,6 @@
 import { TimeControl } from '../../../TimeControl'
 import { HourMinuteSecond, SlowHourMinuteSecond } from '@typinghare/hour-minute-second'
-import { ClockController } from '../../../ClockController'
+import { ClockController, ClockControllerJsonObject } from '../../../ClockController'
 import { Clock } from '../../../Clock'
 import { Player } from '../../../Player'
 
@@ -62,7 +62,7 @@ export class GoByoyomiPlayer extends Player<GoByoyomiTimeControl, GoByoyomiTimeC
     }
 }
 
-type GoByoyomiClockControllerJsonObject = {
+export type GoByoyomiClockControllerJsonObject = ClockControllerJsonObject & {
     remainingPeriods: number
     isEnterByoyomi: boolean
 }
@@ -109,12 +109,15 @@ export class GoByoyomiClockController extends ClockController<GoByoyomiTimeContr
 
     override toJsonObject(): GoByoyomiClockControllerJsonObject {
         return {
+            clock: super.toJsonObject().clock,
             remainingPeriods: this._remainingPeriods!,
             isEnterByoyomi: this._isEnterByoyomi,
         }
     }
 
     override fromJsonObject(jsonObject: GoByoyomiClockControllerJsonObject): void {
+        super.fromJsonObject(jsonObject)
+
         const { remainingPeriods, isEnterByoyomi } = jsonObject
         this._remainingPeriods = remainingPeriods
         this._isEnterByoyomi = isEnterByoyomi

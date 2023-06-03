@@ -41,11 +41,30 @@ export type PlayerClass<T extends TimeControl<TS>, P extends Player<T, TS, PA, P
  * A class of creating a time control.
  */
 export type TimeControlClass<T extends TimeControl<TS>, TS extends TimeControlSettings = any> = new () => T;
+/**
+ * The callback function invoked when a clock runs out of time.
+ */
 export type ClockTimeUpCallback = (timeUpRole: Role) => void;
-export type AnyGame<G extends GameSettings = any, T extends TimeControl<TS> = TimeControl, P extends Player<T, TS, PA, PP> = Player<T>, TS extends TimeControlSettings = any, PA extends PlayerAttributes = any, PP extends PlayerAttributeProperties = any> = Game<G, T, P, TS, PA, PP>;
-export type GameSupplier<G extends GameSettings = any, T extends TimeControl<TS> = TimeControl, P extends Player<T, TS, PA, PP> = Player<T>, TS extends TimeControlSettings = any, PA extends PlayerAttributes = any, PP extends PlayerAttributeProperties = any> = () => Game<G, T, P, TS, PA, PP>;
-export type GameTimeControlType = string;
-export type GameTimeControl<T extends GameTimeControlType> = T[];
-export type GameSupplierMap<T extends GameTimeControlType> = {
-    [K in T]: GameSupplier;
+/**
+ * Interface for objects that can be converted to and from JSON objects.
+ */
+export interface JsonObjectEquivalent<T extends Object> {
+    /**
+     * Converts the object to a JSON object representation.
+     * @returns The JSON object representation of the object.
+     */
+    toJsonObject(): T;
+    /**
+     * Restores the object's state from a JSON object representation.
+     * @param jsonObject - The JSON object from which to restore the object's state.
+     */
+    fromJsonObject(jsonObject: T): void;
+}
+export type GameType = string;
+export type TimeControlType = string;
+export type GameSupplier<G extends GameSettings = GameSettings, T extends TimeControl<TS> = TimeControl, P extends Player<T, TS, PA, PP> = Player<T>, TS extends TimeControlSettings = any, PA extends PlayerAttributes = any, PP extends PlayerAttributeProperties = any> = () => Game<G, T, P, TS, PA, PP>;
+export type Games<GT extends GameType> = {
+    [G in GT]: {
+        [timeControl: string]: GameSupplier<any, any, any>;
+    };
 };

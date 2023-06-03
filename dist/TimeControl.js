@@ -32,5 +32,20 @@ class TimeControl {
      */
     initializeSettings() {
     }
+    toJsonObject() {
+        const settings = {};
+        for (const [name, setting] of Object.entries(this._settings.getSettings())) {
+            // @ts-ignore
+            settings[name] = setting.value;
+        }
+        return { settings };
+    }
+    fromJsonObject(jsonObject) {
+        const { settings } = jsonObject;
+        for (const [name, settingValue] of Object.entries(settings)) {
+            // @ts-ignore
+            this._settings.getSetting(name).value = settingValue;
+        }
+    }
 }
 exports.TimeControl = TimeControl;

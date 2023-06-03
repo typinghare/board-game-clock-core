@@ -2,6 +2,7 @@ import {
     ClockTimeUpCallback,
     GameSettingProperties,
     GameSettings,
+    JsonObjectEquivalent,
     PlayerAttributeProperties,
     PlayerAttributes,
     PlayerClass,
@@ -10,7 +11,7 @@ import {
     TimeControlSettings,
 } from './types'
 import { SettingContainer } from '@typinghare/settings'
-import { Player } from './Player'
+import { Player, PlayerJsonObject } from './Player'
 import { RoleNotFoundException } from './exception/RoleNotFoundException'
 import { TimeControl } from './TimeControl'
 
@@ -23,6 +24,14 @@ export enum GameStatus {
     PAUSED = 2,
     // The game has stopped. Note that a stopped game cannot be resumed.
     STOPPED = 3
+}
+
+export type GameJsonObject = {
+    settings: Record<string, any>
+    roleArray: Role[]
+    playerArray: PlayerJsonObject[],
+    gameStatus: number,
+    timeUpRole?: Role
 }
 
 // noinspection TypeScriptAbstractClassConstructorCanBeMadeProtected
@@ -43,7 +52,7 @@ export abstract class Game<
     TS extends TimeControlSettings = TimeControlSettings,
     PA extends PlayerAttributes = PlayerAttributes,
     PP extends PlayerAttributeProperties = PlayerAttributeProperties,
-> {
+> implements JsonObjectEquivalent<GameJsonObject> {
     /**
      * Game settings.
      * @private
@@ -81,6 +90,18 @@ export abstract class Game<
     protected _timeUpRole?: Role
 
     /**
+     * Time control class.
+     * @protected
+     */
+    protected _timeControlClass: TimeControlClass<T>
+
+    /**
+     * Player class.
+     * @protected
+     */
+    protected _playerClass: PlayerClass<any, P>
+
+    /**
      * Creates a board game.
      * @param roleArray - An array of role labels.
      * @param timeControlClass - Class of creating a time control.
@@ -89,6 +110,8 @@ export abstract class Game<
      */
     public constructor(roleArray: Role[], timeControlClass: TimeControlClass<T>, playerClass: PlayerClass<T, P>) {
         this._roleArray = roleArray
+        this._timeControlClass = timeControlClass
+        this._playerClass = playerClass
 
         // Initialize players.
         for (const role of roleArray) {
@@ -215,5 +238,47 @@ export abstract class Game<
      */
     get timeUpRole(): Role | undefined {
         return this._timeUpRole
+    }
+
+    toJsonObject(): GameJsonObject {
+        const settings = {}
+        for (const [name, setting] of Object.entries(this._settings.getSettings() as object)) {
+            // @ts-ignore
+            settings[name] = setting.value
+        }
+
+        const playerArray = []
+        for (const role of this._roleArray) {
+            playerArray.push(this.getPlayer(role).toJsonObject())
+        }
+
+        return {
+            settings,
+            roleArray: this.roleArray,
+            playerArray,
+            gameStatus: this._gameStatus,
+            timeUpRole: this._timeUpRole,
+        }
+    }
+
+    fromJsonObject(jsonObject: GameJsonObject): void {
+        const { settings, roleArray, playerArray, gameStatus, timeUpRole } = jsonObject
+
+        for (const [name, settingValue] of Object.entries(settings)) {
+            // @ts-ignore
+            this._settings.getSetting(name).value = settingValue
+        }
+
+        for (let i = 0; i < roleArray.length; i++) {
+            const role: Role = roleArray[i]
+            this._roleArray[i] = roleArray[i]
+
+            const player = new this._playerClass(role, this, new this._timeControlClass)
+            player.fromJsonObject(playerArray[i])
+            this._playerMap.set(role, player)
+        }
+
+        this._gameStatus = gameStatus
+        this._timeUpRole = timeUpRole
     }
 }

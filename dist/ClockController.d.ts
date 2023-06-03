@@ -1,21 +1,24 @@
-import { Clock } from './Clock';
+import { Clock, ClockJsonObject } from './Clock';
 import { HourMinuteSecond } from '@typinghare/hour-minute-second';
-import { TimeControlSettings } from './types';
+import { JsonObjectEquivalent, TimeControlSettings } from './types';
 import { TimeControl } from './TimeControl';
 import { Player } from './Player';
+export type ClockControllerJsonObject = {
+    clock: ClockJsonObject;
+};
 /**
- * Clock controller.
+ * Abstract clock controller.
  * @param <TS> Time control settings.
  * @author James Chan
  */
-export declare abstract class ClockController<TS extends TimeControlSettings = any> {
+export declare abstract class ClockController<TS extends TimeControlSettings = any> implements JsonObjectEquivalent<ClockControllerJsonObject> {
     /**
      * The player creating this clock controller.
      * @protected
      */
     protected readonly _player: Player;
     /**
-     * Time control.
+     * The time control.
      * @protected
      */
     protected readonly _timeControl: TimeControl<TS>;
@@ -30,7 +33,7 @@ export declare abstract class ClockController<TS extends TimeControlSettings = a
      */
     constructor(player: Player);
     /**
-     * Initializes a clock.
+     * Initializes the clock.
      * @protected
      */
     protected abstract initializeClock(): Clock;
@@ -50,4 +53,6 @@ export declare abstract class ClockController<TS extends TimeControlSettings = a
      * Returns the time of the clock.
      */
     get clockTime(): HourMinuteSecond;
+    toJsonObject(): ClockControllerJsonObject;
+    fromJsonObject(jsonObject: ClockControllerJsonObject): void;
 }

@@ -1,7 +1,7 @@
 import { HourMinuteSecond, SlowHourMinuteSecond } from '@typinghare/hour-minute-second'
 import { Player } from '../../../Player'
 import { TimeControl } from '../../../TimeControl'
-import { ClockController } from '../../../ClockController'
+import { ClockController, ClockControllerJsonObject } from '../../../ClockController'
 import { Clock } from '../../../Clock'
 
 export type ChessStandardTimeControlSettings = {
@@ -67,6 +67,10 @@ export class ChessStandardPlayer extends Player<
     }
 }
 
+export type ChessStandardClockControllerJsonObject = ClockControllerJsonObject & {
+    resumedTimeMs?: number
+}
+
 export class ChessStandardClockController extends ClockController<ChessStandardTimeControlSettings> {
     private _resumedTime?: HourMinuteSecond
 
@@ -114,5 +118,21 @@ export class ChessStandardClockController extends ClockController<ChessStandardT
 
         const currentTime = this._clock.time.ms
         return Math.floor((this._resumedTime.ms - currentTime) / HourMinuteSecond.MILLISECONDS_IN_SECOND)
+    }
+
+    override toJsonObject(): ChessStandardClockControllerJsonObject {
+        return {
+            clock: super.toJsonObject().clock,
+            resumedTimeMs: this._resumedTime && this._resumedTime.ms,
+        }
+    }
+
+    override fromJsonObject(jsonObject: ChessStandardClockControllerJsonObject): void {
+        super.fromJsonObject(jsonObject)
+
+        const { resumedTimeMs } = jsonObject
+        if (resumedTimeMs) {
+            this._resumedTime = new SlowHourMinuteSecond(resumedTimeMs)
+        }
     }
 }

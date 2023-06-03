@@ -75,5 +75,20 @@ class Player {
     initializeClockController() {
         this._clockController = this.createClockController();
     }
+    toJsonObject() {
+        var _a;
+        return {
+            timeControl: this._timeControl.toJsonObject(),
+            clockController: (_a = this._clockController) === null || _a === void 0 ? void 0 : _a.toJsonObject(),
+        };
+    }
+    fromJsonObject(jsonObject) {
+        var _a;
+        const { timeControl, clockController } = jsonObject;
+        this._timeControl.fromJsonObject(timeControl);
+        if (clockController) {
+            (_a = this._clockController) === null || _a === void 0 ? void 0 : _a.fromJsonObject(clockController);
+        }
+    }
 }
 exports.Player = Player;

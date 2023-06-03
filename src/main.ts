@@ -2,6 +2,7 @@
 export * from './Clock'
 export * from './ClockController'
 export * from './Game'
+export * from './GameContainer'
 export * from './Player'
 export * from './TimeControl'
 
@@ -9,17 +10,16 @@ export * from './TimeControl'
 export * from './types'
 
 // exceptions
-export * from './exception/RoleNotFoundException'
 export * from './exception/ClockControllerNotInitializedException'
+export * from './exception/GameTypeNotFoundException'
+export * from './exception/RoleNotFoundException'
+export * from './exception/TimeControlNotFoundException'
 
-// game
-// 1. go
-export * from './standard/game/go/GoGame'
-export * from './standard/game/go/GoByoyomi'
-export * from './standard/game/go/GoYingshi'
-// 2. chess
-export * from './standard/game/chess/ChessGame'
-export * from './standard/game/chess/ChessStandard'
+// standard game
+export * from './standard/standard-game'
 
 // stereotype
 export * from './stereotype/TwoPlayerGame'
+
+// tool
+export * from './GameHolder'

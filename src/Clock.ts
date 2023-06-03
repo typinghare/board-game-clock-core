@@ -1,7 +1,7 @@
 import { HourMinuteSecond, SlowHourMinuteSecond } from '@typinghare/hour-minute-second'
 import { JsonObjectEquivalent } from './types'
 
-type ClockJsonObject = {
+export type ClockJsonObject = {
     isRunning: boolean,
     remainingTime: number
 }

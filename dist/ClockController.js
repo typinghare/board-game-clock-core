@@ -2,7 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ClockController = void 0;
 /**
- * Clock controller.
+ * Abstract clock controller.
  * @param <TS> Time control settings.
  * @author James Chan
  */
@@ -26,23 +26,26 @@ class ClockController {
      * Resumes the clock if the clock is not running.
      */
     resumeClock() {
-        if (!this.isClockRunning()) {
-            this._clock.resume();
-        }
+        this.isClockRunning() || this._clock.resume();
     }
     /**
      * Pauses the clock if the clock is running.
      */
     pauseClock() {
-        if (this.isClockRunning()) {
-            this._clock.pause();
-        }
+        this.isClockRunning() && this._clock.pause();
     }
     /**
      * Returns the time of the clock.
      */
     get clockTime() {
         return this._clock.time;
+    }
+    toJsonObject() {
+        return { clock: this._clock.toJsonObject() };
+    }
+    fromJsonObject(jsonObject) {
+        const { clock } = jsonObject;
+        this._clock.fromJsonObject(clock);
     }
 }
 exports.ClockController = ClockController;

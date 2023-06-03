@@ -1,7 +1,7 @@
 import { HourMinuteSecond, SlowHourMinuteSecond } from '@typinghare/hour-minute-second'
 import { TimeControl } from '../../../TimeControl'
 import { Player } from '../../../Player'
-import { ClockController } from '../../../ClockController'
+import { ClockController, ClockControllerJsonObject } from '../../../ClockController'
 import { Clock } from '../../../Clock'
 
 export type GoYingshiTimeControlSettings = {
@@ -59,6 +59,10 @@ export class GoYingshiPlayer extends Player<GoYingshiTimeControl, GoYingshiTimeC
     }
 }
 
+export type GoYingshiControllerJsonObject = ClockControllerJsonObject & {
+    penaltiesUsed: number
+}
+
 export class GoYingshiClockController extends ClockController<GoYingshiTimeControlSettings> {
     private _penaltiesUsed: number = 0
 
@@ -82,5 +86,19 @@ export class GoYingshiClockController extends ClockController<GoYingshiTimeContr
 
     get penaltiesUsed(): number {
         return this._penaltiesUsed
+    }
+
+    override toJsonObject(): GoYingshiControllerJsonObject {
+        return {
+            clock: super.toJsonObject().clock,
+            penaltiesUsed: this._penaltiesUsed!,
+        }
+    }
+
+    override fromJsonObject(jsonObject: GoYingshiControllerJsonObject): void {
+        super.fromJsonObject(jsonObject)
+
+        const { penaltiesUsed } = jsonObject
+        this._penaltiesUsed = penaltiesUsed
     }
 }

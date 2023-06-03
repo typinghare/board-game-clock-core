@@ -1,8 +1,12 @@
 import { SettingContainer } from '@typinghare/settings';
-import { PlayerAttributeProperties, PlayerAttributes, Role, TimeControlSettings } from './types';
+import { JsonObjectEquivalent, PlayerAttributeProperties, PlayerAttributes, Role, TimeControlSettings } from './types';
 import { Game } from './Game';
-import { TimeControl } from './TimeControl';
-import { ClockController } from './ClockController';
+import { TimeControl, TimeControlJsonObject } from './TimeControl';
+import { ClockController, ClockControllerJsonObject } from './ClockController';
+export type PlayerJsonObject = {
+    timeControl: TimeControlJsonObject;
+    clockController?: ClockControllerJsonObject;
+};
 /**
  * Abstract board game player.
  * @param <T> - Time control settings.
@@ -11,7 +15,7 @@ import { ClockController } from './ClockController';
  * @param <PP> - Player attributes properties.
  * @author James Chan
  */
-export declare abstract class Player<T extends TimeControl<TS> = TimeControl, TS extends TimeControlSettings = any, PA extends PlayerAttributes = any, PP extends PlayerAttributeProperties = any> {
+export declare abstract class Player<T extends TimeControl<TS> = TimeControl, TS extends TimeControlSettings = any, PA extends PlayerAttributes = any, PP extends PlayerAttributeProperties = any> implements JsonObjectEquivalent<PlayerJsonObject> {
     /**
      * Player attributes.
      * @private
@@ -75,4 +79,6 @@ export declare abstract class Player<T extends TimeControl<TS> = TimeControl, TS
      * Initialize controller.
      */
     initializeClockController(): void;
+    toJsonObject(): PlayerJsonObject;
+    fromJsonObject(jsonObject: PlayerJsonObject): void;
 }

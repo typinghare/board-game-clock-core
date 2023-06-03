@@ -10,13 +10,16 @@ const keypress = require('keypress');
 class GameClockSimulator {
     /**
      * Creates a game simulator.
-     * @param game - Game.
-     * @param refreshRate - Refresh rate.
+     * @param game - The game to simulate.
+     * @param refreshRate - The game refresh rate.
      */
     constructor(game, refreshRate = GameClockSimulator.DEFAULT_REFRESH_RATE) {
         this._game = game;
         this._refreshRate = refreshRate;
     }
+    /**
+     * Starts simulation.
+     */
     start() {
         const roleArray = this._game.roleArray;
         const firstPlayer = this._game.getPlayer(roleArray[0]);
@@ -104,7 +107,7 @@ class GameClockSimulator {
 }
 exports.GameClockSimulator = GameClockSimulator;
 /**
- * Default refresh rate.
+ * Default game refresh rate.
  * @private
  */
 GameClockSimulator.DEFAULT_REFRESH_RATE = 20;

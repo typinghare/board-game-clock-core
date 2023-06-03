@@ -5,9 +5,14 @@ const settings_1 = require("@typinghare/settings");
 const RoleNotFoundException_1 = require("./exception/RoleNotFoundException");
 var GameStatus;
 (function (GameStatus) {
+    // The game has been created but not started.
     GameStatus[GameStatus["PENDING"] = 0] = "PENDING";
+    // The game has been started.
     GameStatus[GameStatus["STARTED"] = 1] = "STARTED";
-    GameStatus[GameStatus["STOPPED"] = 2] = "STOPPED";
+    // The game has been paused.
+    GameStatus[GameStatus["PAUSED"] = 2] = "PAUSED";
+    // The game has stopped. Note that a stopped game cannot be resumed.
+    GameStatus[GameStatus["STOPPED"] = 3] = "STOPPED";
 })(GameStatus = exports.GameStatus || (exports.GameStatus = {}));
 // noinspection TypeScriptAbstractClassConstructorCanBeMadeProtected
 /**
@@ -23,7 +28,7 @@ var GameStatus;
 class Game {
     /**
      * Creates a board game.
-     * @param roleArray - An array of roles.
+     * @param roleArray - An array of role labels.
      * @param timeControlClass - Class of creating a time control.
      * @param playerClass - Mapping of roles to players.
      * @protected
@@ -45,6 +50,8 @@ class Game {
          */
         this._gameStatus = GameStatus.PENDING;
         this._roleArray = roleArray;
+        this._timeControlClass = timeControlClass;
+        this._playerClass = playerClass;
         // Initialize players.
         for (const role of roleArray) {
             this._playerMap.set(role, new playerClass(role, this, new timeControlClass()));
@@ -152,6 +159,40 @@ class Game {
      */
     get timeUpRole() {
         return this._timeUpRole;
+    }
+    toJsonObject() {
+        const settings = {};
+        for (const [name, setting] of Object.entries(this._settings.getSettings())) {
+            // @ts-ignore
+            settings[name] = setting.value;
+        }
+        const playerArray = [];
+        for (const role of this._roleArray) {
+            playerArray.push(this.getPlayer(role).toJsonObject());
+        }
+        return {
+            settings,
+            roleArray: this.roleArray,
+            playerArray,
+            gameStatus: this._gameStatus,
+            timeUpRole: this._timeUpRole,
+        };
+    }
+    fromJsonObject(jsonObject) {
+        const { settings, roleArray, playerArray, gameStatus, timeUpRole } = jsonObject;
+        for (const [name, settingValue] of Object.entries(settings)) {
+            // @ts-ignore
+            this._settings.getSetting(name).value = settingValue;
+        }
+        for (let i = 0; i < roleArray.length; i++) {
+            const role = roleArray[i];
+            this._roleArray[i] = roleArray[i];
+            const player = new this._playerClass(role, this, new this._timeControlClass);
+            player.fromJsonObject(playerArray[i]);
+            this._playerMap.set(role, player);
+        }
+        this._gameStatus = gameStatus;
+        this._timeUpRole = timeUpRole;
     }
 }
 exports.Game = Game;

@@ -17,6 +17,19 @@ class Clock {
         this._time = initialTime.clone();
         this._timeUpCallback = timeUpCallback;
     }
+    toJsonObject() {
+        return {
+            isRunning: this.isRunning(),
+            remainingTime: this.time.ms,
+        };
+    }
+    fromJsonObject(jsonObject) {
+        const { isRunning, remainingTime } = jsonObject;
+        this._time = new hour_minute_second_1.SlowHourMinuteSecond(remainingTime);
+        if (isRunning) {
+            this.resume();
+        }
+    }
     /**
      * Sets time.
      * @param time time to set.
@@ -95,7 +108,7 @@ class Clock {
         }
     }
     /**
-     * Sets before resume call back function.
+     * Sets before resume callback function.
      * @param beforeResume
      */
     set beforeResume(beforeResume) {

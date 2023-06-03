@@ -48,8 +48,8 @@ describe('Standard game holder tests.', function(): void {
     const goGame2 = standardGameHolder2.game
 
     it('Test game type and time control type.', function() {
-        expect(standardGameHolderJsonObject.gameType).toBe('Go')
-        expect(standardGameHolderJsonObject.timeControlType).toBe('Byoyomi')
+        expect(standardGameHolder2.gameType).toBe('Go')
+        expect(standardGameHolder2.timeControlType).toBe('Byoyomi')
     })
 
     it('Test time control settings.', function(): void {

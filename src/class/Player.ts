@@ -1,9 +1,9 @@
 import { Role } from '../types'
 import { Game } from './Game'
 import { TimerController } from './TimerController'
-import { HourMinuteSecond } from '@typinghare/hour-minute-second'
 import { DataCollection } from '@typinghare/extrum'
 import { PlayerSettings } from './GameSettings'
+import { TimerControllerNotFoundException } from './exception/TimerControllerNotFoundException'
 
 export type PlayerClass = new (...args: ConstructorParameters<typeof Player>) => Player
 
@@ -15,7 +15,7 @@ export class Player<P extends PlayerSettings = PlayerSettings> {
      * Timer controller.
      * @protected
      */
-    protected internalTimerController?: TimerController
+    protected timerController?: TimerController<P>
 
     /**
      * Creates a player.
@@ -38,8 +38,12 @@ export class Player<P extends PlayerSettings = PlayerSettings> {
     /**
      * Returns the timer controller.
      */
-    getTimerController(): TimerController | undefined {
-        return this.internalTimerController
+    getTimerController(): TimerController<P> {
+        if (this.timerController === undefined) {
+            throw new TimerControllerNotFoundException()
+        }
+
+        return this.timerController
     }
 
     /**
@@ -57,13 +61,30 @@ export class Player<P extends PlayerSettings = PlayerSettings> {
     }
 
     /**
+     * This player taps their timer region.
+     */
+    tap(): void {
+        // Pause this player's clock
+        this.timerController?.pauseClock()
+
+        // Resume next player's clock
+        const nextPlayer = this.game.getNextPlayer(this.role)
+        nextPlayer.timerController?.resumeTimer()
+    }
+
+    /**
+     * This player gets ready for the game. This method is invoked only when the game starts.
+     */
+    getReady(): void {
+        this.timerController = this.createTimerController()
+    }
+
+    /**
      * Creates and returns a timer controller.
      * @protected
      */
-    protected createTimerController(): TimerController {
-        const playerSettings = this.game.getGameSettings().getPlayerSettings(this.role)
-        const main: HourMinuteSecond = playerSettings.getDatum('main').value
-
+    protected createTimerController(): TimerController<P> {
+        // @ts-ignore
         return new TimerController(this)
     }
 }

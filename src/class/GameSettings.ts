@@ -2,7 +2,6 @@ import { Role } from '../types'
 import { DataCollection } from '@typinghare/extrum'
 import { HourMinuteSecond } from '@typinghare/hour-minute-second'
 import { Game } from './Game'
-import { TimeControl } from './TimeControl'
 
 /**
  * Default player settings. Each player has their own settings.
@@ -64,20 +63,40 @@ export class GameSettings<
     private readonly advancedSettings: DataCollection<A>
 
     /**
+     * Player settings to displayed.
+     * @private
+     */
+    private readonly displayedPlayerSettings: (keyof P)[]
+
+    /**
+     * Advanced game settings to displayed.
+     * @private
+     */
+    private readonly displayedAdvancedSettings: (keyof A)[]
+
+    /**
      * Creates a settings.
      */
     constructor(
         game: Game<R, P, A, M>,
-        timeControl: TimeControl<P>,
     ) {
         // Initialize player settings
-        const roleArray: R[] = game.getRoleArray()
-        roleArray.forEach(role => {
-            this.playerSettings.set(role, timeControl.initializePlayerSettings())
-        })
+        const roleList: R[] = game.getRoleList()
+        const timeControl = game.getTimeControl()
+        roleList.forEach(role => this.playerSettings.set(role, timeControl.initializePlayerSettings()))
+        this.displayedPlayerSettings = timeControl.setDisplayedPlayerSettings()
 
         // Initialize advanced settings
         this.advancedSettings = game.initializeAdvancedSettings()
+        this.displayedAdvancedSettings = [] as (keyof A)[]
+    }
+
+    /**
+     * Returns a specified player's settings.
+     * @param role The role of the player.
+     */
+    getPlayerSettings(role: R): DataCollection<P> {
+        return this.playerSettings.get(role)!
     }
 
     /**
@@ -88,10 +107,16 @@ export class GameSettings<
     }
 
     /**
-     * Returns a specified player's settings.
-     * @param role The role of the player.
+     * Returns player settings to display.
      */
-    getPlayerSettings(role: R): DataCollection<P> {
-        return this.playerSettings.get(role)!
+    getDisplayedPlayerSettings(): (keyof P)[] {
+        return this.displayedPlayerSettings
+    }
+
+    /**
+     * Returns advanced game settings to display.
+     */
+    getDisplayedAdvancedSettings(): (keyof A)[] {
+        return this.displayedAdvancedSettings
     }
 }

@@ -50,4 +50,6 @@ const game = new TwoPlayerGame(new TimeControl(), Player)
 
 ~~~
 
+## Use Simulator
+
 ## Customize a New Game

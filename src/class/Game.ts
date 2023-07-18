@@ -7,7 +7,7 @@ import { DataCollection, DataMapping } from '@typinghare/extrum'
 /**
  * Callback function fired when the game stops.
  */
-export type StopCallback<R extends Role> = (stopperRole: R | undefined, timeUpRole: R | undefined) => {}
+export type StopCallback<R extends Role> = (stopperRole: R | undefined, timeUpRole: R | undefined) => void
 
 /**
  * Game status.
@@ -54,24 +54,32 @@ export class Game<
     protected stopCallback?: StopCallback<Role>
 
     /**
+     * The role whose timer stops due to time up.
+     * @protected
+     */
+    protected timeUpRole ?: R
+
+    /**
      * Creates a game.
-     * @param roleArray The array of roles.
+     * @param roleList The array of roles.
      * @param timeControl The time control applied.
      * @param playerClass The player class.
      */
     constructor(
-        protected readonly roleArray: R[],
+        protected readonly roleList: R[],
         protected readonly timeControl: TimeControl<P>,
         protected readonly playerClass: PlayerClass,
     ) {
         // Initialize players
         this.playerMap = new Map()
-        roleArray.forEach(role => {
-            this.playerMap.set(role, new playerClass(this, role))
+        roleList.forEach(role => {
+            // @ts-ignore
+            const player = new playerClass(this, role)
+            this.playerMap.set(role, player)
         })
 
         // Create game settings
-        this.gameSettings = new GameSettings<R, P, A, M>(this, timeControl)
+        this.gameSettings = new GameSettings<R, P, A, M>(this)
     }
 
     /**
@@ -85,8 +93,12 @@ export class Game<
     /**
      * Returns the role array.
      */
-    getRoleArray(): R[] {
-        return this.roleArray
+    getRoleList(): R[] {
+        return this.roleList
+    }
+
+    getTimeControl(): TimeControl<P> {
+        return this.timeControl
     }
 
     /**
@@ -95,7 +107,7 @@ export class Game<
      * @throws Error if the role does not exist.
      */
     getRoleIndex(role: R): number {
-        const index = this.roleArray.indexOf(role)
+        const index = this.roleList.indexOf(role)
         if (index === -1) {
             throw new Error('The role does not exist.')
         }
@@ -116,7 +128,7 @@ export class Game<
      * @param role The current role.
      */
     getNextIndex(role: R): number {
-        return (this.getRoleIndex(role) + 1) % this.roleArray.length
+        return (this.getRoleIndex(role) + 1) % this.roleList.length
     }
 
     /**
@@ -124,7 +136,7 @@ export class Game<
      * @param role The current role.
      */
     getNextRole(role: R): R {
-        return this.roleArray[this.getNextIndex(role)]
+        return this.roleList[this.getNextIndex(role)]
     }
 
     /**
@@ -139,6 +151,11 @@ export class Game<
      * Starts this game.
      */
     start(): void {
+        // Players get ready
+        for (const player of this.playerMap.values()) {
+            player.getReady()
+        }
+
         this.gameStatus = GameStatus.STARTED
     }
 
@@ -164,10 +181,26 @@ export class Game<
     stop(stopperRole?: R | undefined, timeUpRole?: R | undefined): void {
         this.gameStatus = GameStatus.STOPPED
 
-        // Fire stop callback function
+        this.timeUpRole = timeUpRole
+
+        // Fire the stop callback function
         if (this.stopCallback) {
             this.stopCallback(stopperRole, timeUpRole)
         }
+    }
+
+    /**
+     * Returns game status.
+     */
+    getGameStatus(): GameStatus {
+        return this.gameStatus
+    }
+
+    /**
+     * Returns time up role.
+     */
+    getTimeUpRole(): R | undefined {
+        return this.timeUpRole
     }
 
     /**

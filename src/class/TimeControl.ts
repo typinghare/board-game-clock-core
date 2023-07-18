@@ -2,8 +2,6 @@ import { DataCollection, DataMapping, Datum } from '@typinghare/extrum'
 import { SlowHourMinuteSecond } from '@typinghare/hour-minute-second'
 import { PlayerSettings, SettingMetadata } from './GameSettings'
 
-export type TimeControlClass = new (...args: ConstructorParameters<typeof TimeControl>) => TimeControl
-
 export class TimeControl<
     P extends PlayerSettings = PlayerSettings,
 > {
@@ -15,8 +13,15 @@ export class TimeControl<
             main: new Datum<PlayerSettings['main'], SettingMetadata>(SlowHourMinuteSecond.ofMinutes(10), {
                 type: 'time',
                 label: 'Main',
-                description: 'Main time.',
+                description: 'The main time.',
             }),
         } as DataMapping<P>)
+    }
+
+    /**
+     * Set displayed player settings.
+     */
+    setDisplayedPlayerSettings(): (keyof P)[] {
+        return ['main']
     }
 }

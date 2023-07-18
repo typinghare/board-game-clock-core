@@ -1,20 +1,23 @@
-import { Game } from '../class/Game'
+import { Game, GameStatus } from '../class/Game'
 import { Player } from '../class/Player'
 import { getClassName } from '../util'
 import * as process from 'process'
-import { HourMinuteSecond } from '@typinghare/hour-minute-second'
 import { Role } from '../types'
+import * as readline from 'readline'
+import { toNumber } from 'lodash'
+import { HourMinuteSecond } from '@typinghare/hour-minute-second'
+import chalk from 'chalk'
 
-const keypress = require('keypress')
-
-type KeypressCallback = (ch: string) => void
+type KeypressCallback = (ch: string, key: any) => void
 
 export class Simulator {
     /**
      * Default game refresh rate.
      * @private
      */
-    private static DEFAULT_REFRESH_RATE: number = 20
+    private static DEFAULT_REFRESH_RATE: number = 30
+
+    protected readonly interval: number
 
     /**
      * Creates a game simulator.
@@ -25,68 +28,112 @@ export class Simulator {
         private game: Game,
         private readonly refreshRate: number = Simulator.DEFAULT_REFRESH_RATE,
     ) {
+        this.interval = Math.round(HourMinuteSecond.MILLISECONDS_IN_SECOND / refreshRate)
     }
 
     /**
      * Starts simulation.
      */
     start(): void {
-        const roleArray: Role[] = this.game.getRoleArray()
-        const player: Player = this.game.getPlayer(roleArray[0])
+        const roleList: Role[] = this.game.getRoleList()
+        const player: Player = this.game.getPlayer(roleList[0])
         const gameClassName: string = getClassName(this.game)
         const playerClassName: string = getClassName(player)
-        const timeControlClassName: string = getClassName(player.getTimeControl())
+        const timeControlClassName: string = getClassName(this.game.getTimeControl())
 
         // Prints game information.
+        this.print(`[ Game ]`)
+        this.print(`Game Class: ${gameClassName}`)
+        this.print(`Player Class: ${playerClassName}`)
+        this.print(`Time Control Class: ${timeControlClassName}`)
 
-        // Prints player roles.
+        // Prints player information
+        this.print()
+        this.print(`[ Player ]`)
+
+        // Stops interval when the game stops
+        this.game.onStop = (stopperRole, timeUpRole) => {
+            // Stop the game until the next frame
+            setTimeout(() => {
+                clearInterval(intervalHandle)
+
+                if (timeUpRole) {
+                    this.print(`\nThe board game has been stopped because` +
+                        ` player ${timeUpRole.toString()} has run out of time.`)
+                } else if (stopperRole) {
+                    // unreachable branch
+                }
+
+                process.exit(0)
+            }, this.interval)
+        }
+
+        // Initialize keypress
+        this.enableKeypress((ch) => {
+            const numberKey = toNumber(ch)
+            if (!isNaN(numberKey)) {
+                if (numberKey <= roleList.length) {
+                    const role = roleList[numberKey - 1]
+                    const player = this.game.getPlayer(role)
+                    player.tap()
+                }
+            }
+        })
 
         // Starts the game.
         this.game.start()
-        this.print(`Board game has started. You can mock players' clicking by pressing corresponding number keys.`)
+        this.print()
+        this.print(`The game has been started.`)
+        this.print(`You can mock players' tapping by pressing corresponding number keys.`)
+        this.print(`Press Ctrl+C to exit the program.\n`)
 
         // Sets interval.
         const startTimestamp = new Date().getTime()
-        const intervalHandle = setInterval((): void => {
-            process.stdout.cursorTo(0)
-            for (let i = 0; i < roleArray.length + 2; i++) {
-                process.stdout.moveCursor(0, -1)
-                process.stdout.clearLine(0)
+        let firstRound: boolean = true
+        const intervalHandle = setInterval(() => {
+            if (firstRound) {
+                firstRound = false
+            } else {
+                process.stdout.cursorTo(0)
+                for (let i = 0; i < roleList.length + 2; i++) {
+                    process.stdout.moveCursor(0, -1)
+                    process.stdout.clearLine(0)
+                }
             }
 
             // Print players.
-            this.print(this.getPlayerString(roleArray))
+            this.print(this.getPlayerString())
 
             // Print elapsed time.
-            const runTime: number
+            const elapsedTime: number
                 = Math.floor((new Date().getTime() - startTimestamp) / HourMinuteSecond.MILLISECONDS_IN_SECOND)
-            this.print(`\n(${runTime} seconds has elapsed)`)
-        })
-
-        // Stops interval when the game stops.
-        // this.game.clockTimeUpCallback = (timeUpRole): void => {
-        //     clearInterval(intervalHandle)
-        //     this.game.stop()
-        //
-        //     this.print(`\nThe board game has been stopped because Player ${timeUpRole.toString()} has run out of time.`)
-        //     process.exit(0)
-        // }
-
-        // Initialize keypress.
-        this.enableKeypress((ch) => {
-
-        })
+            this.print(`(${elapsedTime} seconds has elapsed)`)
+        }, this.interval)
     }
 
-    private getPlayerString(roleArray: Role[]): string {
-        const clockStringArray: string[] = []
-        for (let i = 0; i < roleArray.length; i++) {
-            const role: Role = roleArray[i]
+    private getPlayerString(): string {
+        const roleList = this.game.getRoleList()
+
+        const timerStringArray: string[] = []
+        const isGameStopped = this.game.getGameStatus() === GameStatus.STOPPED
+        const timeUpRole = this.game.getTimeUpRole()
+        for (let i = 0; i < roleList.length; i++) {
+            const role: Role = roleList[i]
             const player = this.game.getPlayer(role)
-            // clockStringArray[i] = role + `(${i + 1}): ` + player.clockController.clockTime.toString()
-            //
+            const timerController = player.getTimerController()
+            const time = timerController.getTime()
+            const isTimerRunning = timerController.isTimerRunning()
+
+            if (isGameStopped && timeUpRole === role) {
+                timerStringArray[i] = `${role}(${i + 1}): ${chalk.red(time)}`
+            } else {
+                timerStringArray[i] = `${role}(${i + 1}): ` + (
+                    isTimerRunning ? chalk.green(time) : chalk.grey(time)
+                )
+            }
+
             // // Appends extra properties.
-            // const playerAttributes = player.attributes.getSettings()
+            // const playerAttributes = player
             // if (Object.keys(playerAttributes).length > 0) {
             //     const attributeStringArray: string[] = []
             //     for (const attribute of Object.values(playerAttributes)) {
@@ -97,7 +144,7 @@ export class Simulator {
             // }
         }
 
-        return clockStringArray.join('\n') + '\n'
+        return timerStringArray.join('\n') + '\n'
     }
 
     /**
@@ -105,7 +152,7 @@ export class Simulator {
      * @param content The content to print.
      * @private
      */
-    private print(content: string): void {
+    private print(content: string = ''): void {
         process.stdin.pause()
         console.log(content)
         process.stdin.resume()
@@ -117,19 +164,19 @@ export class Simulator {
      * @private
      */
     private enableKeypress(onKeypress: KeypressCallback): void {
-        keypress(process.stdin)
+        // Enable raw mode to capture keypress events
+        readline.emitKeypressEvents(process.stdin)
+        process.stdin.setRawMode(true)
 
-        process.stdin.on('keypress', (ch, key): void => {
-            onKeypress(ch)
-
-            // Ctrl+C exits program.
-            if (key && key.ctrl && key.name == 'c') {
-                process.stdin.pause()
-                process.exit(0)
+        // Listen for individual keypress events
+        process.stdin.on('keypress', (ch, key) => {
+            if (key['ctrl'] === true && key.name === 'c') {
+                process.exit()
             }
+
+            onKeypress(ch === undefined ? '' : ch.toString(), key)
         })
 
-        process.stdin.setRawMode(true)
         process.stdin.resume()
     }
 }

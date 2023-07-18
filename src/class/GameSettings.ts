@@ -1,9 +1,11 @@
 import { Role } from '../types'
-import { DataCollection, DataMapping, Datum } from '@typinghare/extrum'
-import { HourMinuteSecond, SlowHourMinuteSecond } from '@typinghare/hour-minute-second'
+import { DataCollection } from '@typinghare/extrum'
+import { HourMinuteSecond } from '@typinghare/hour-minute-second'
+import { Game } from './Game'
+import { TimeControl } from './TimeControl'
 
 /**
- * Default player settings.
+ * Default player settings. Each player has their own settings.
  */
 export interface PlayerSettings {
     main: HourMinuteSecond
@@ -15,19 +17,30 @@ export interface PlayerSettings {
 export interface AdvancedSettings {
 }
 
+type BoolSettingMetadata = {
+    type: 'bool'
+}
+
+type NumberSettingMetadata = {
+    type: 'number'
+    options?: number[]
+}
+
+type TimeSettingMetadata = {
+    type: 'time'
+    options?: HourMinuteSecond[]
+}
+
 /**
  * Default setting metadata.
  */
-export interface SettingMetadata {
-    type: 'bool' | 'number' | 'time'
+export type SettingMetadata = {
+    // The label of the setting
     label: string
-    description: string
-    options?: (number | HourMinuteSecond)[]
-}
 
-type PlayerSettingsMap<R extends Role, P extends PlayerSettings> = {
-    [role in R]: DataCollection<P>
-}
+    // The description of the setting
+    description?: string
+} & (BoolSettingMetadata | NumberSettingMetadata | TimeSettingMetadata)
 
 /**
  * Game settings.
@@ -39,32 +52,38 @@ export class GameSettings<
     M extends SettingMetadata = SettingMetadata
 > {
     /**
+     * Player role => player settings.
+     * @private
+     */
+    private readonly playerSettings: Map<R, DataCollection<P>> = new Map()
+
+    /**
      * Advanced game settings.
      * @private
      */
     private readonly advancedSettings: DataCollection<A>
 
     /**
-     * Player role => player settings.
-     * @private
-     */
-    private readonly playerSettings: PlayerSettingsMap<R, P>
-
-    /**
      * Creates a settings.
-     * @param roleArray The role array.
      */
-    constructor(roleArray: R[]) {
-        this.advancedSettings = this.initializeAdvancedSettings()
-        this.playerSettings = roleArray.map(() => {
-            return this.initializePlayerSettings()
-        }) as { [role in R]: DataCollection<P> }
+    constructor(
+        game: Game<R, P, A, M>,
+        timeControl: TimeControl<P>,
+    ) {
+        // Initialize player settings
+        const roleArray: R[] = game.getRoleArray()
+        roleArray.forEach(role => {
+            this.playerSettings.set(role, timeControl.initializePlayerSettings())
+        })
+
+        // Initialize advanced settings
+        this.advancedSettings = game.initializeAdvancedSettings()
     }
 
     /**
      * Returns advanced game settings.
      */
-    getAdvancedSettings(): DataCollection {
+    getAdvancedSettings(): DataCollection<A> {
         return this.advancedSettings
     }
 
@@ -72,16 +91,7 @@ export class GameSettings<
      * Returns a specified player's settings.
      * @param role The role of the player.
      */
-    getPlayerSettings(role: R) {
-        return this.playerSettings[role]
+    getPlayerSettings(role: R): DataCollection<P> {
+        return this.playerSettings.get(role)!
     }
-
-    /**
-     * Initialize game settings.
-     */
-    protected initializeAdvancedSettings(): DataCollection<A> {
-        return new DataCollection<A>({} as DataMapping<A>)
-    }
-
-
 }

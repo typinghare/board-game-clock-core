@@ -15,8 +15,8 @@ dependencies:
     specifier: ^2.3.15
     version: 2.3.15
   '@typinghare/extrum':
-    specifier: ^1.0.1
-    version: 1.0.1
+    specifier: ^1.0.3
+    version: 1.0.3
   '@typinghare/hour-minute-second':
     specifier: 1.0.2
     version: 1.0.2
@@ -757,8 +757,8 @@ packages:
       '@types/yargs-parser': 21.0.0
     dev: true
 
-  /@typinghare/extrum@1.0.1:
-    resolution: {integrity: sha512-Rk50M09jXOQjGjL+XvlvRKbUCh7dcxHX4Rd7al2ODtLKC62t9VYG0oUuFeIg2l8WQ0Io8iMSs8vHPoZqawSfDg==}
+  /@typinghare/extrum@1.0.3:
+    resolution: {integrity: sha512-G7Ss+B6BoCgIaKSDOIjEoBjtCFhKeK0u9nuxgg0OiaFtKP5XU5kdIYOjlmXY26lv36uH1d0TiMC6XV+kl+jdZA==}
     dev: false
 
   /@typinghare/hour-minute-second@1.0.2:

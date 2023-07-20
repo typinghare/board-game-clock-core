@@ -53,6 +53,13 @@ export class TimerController<P extends PlayerSettings = PlayerSettings> {
     }
 
     /**
+     * This player's timer ends (time is up).
+     */
+    timerEnd(): void {
+        this.player.timerEnd()
+    }
+
+    /**
      * Creates a timer.
      * @protected
      */

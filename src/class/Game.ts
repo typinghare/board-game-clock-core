@@ -7,7 +7,7 @@ import { DataCollection, DataMapping } from '@typinghare/extrum'
 /**
  * Callback function fired when the game stops.
  */
-export type StopCallback<R extends Role> = (stopperRole: R | undefined, timeUpRole: R | undefined) => void
+export type StopCallback = (stopperRole: Role | undefined, timeUpRole: Role | undefined) => void
 
 /**
  * Game status.
@@ -24,7 +24,6 @@ export enum GameStatus {
  * @param <G> - Game settings.
  */
 export class Game<
-    R extends Role = Role,
     P extends PlayerSettings = PlayerSettings,
     A extends AdvancedSettings = AdvancedSettings,
     M extends SettingMetadata = SettingMetadata
@@ -33,13 +32,13 @@ export class Game<
      * The settings of this game.
      * @protected
      */
-    protected readonly gameSettings: GameSettings<R, P, A, M>
+    protected readonly gameSettings: GameSettings<P, A, M>
 
     /**
      * The map of players.
      * @protected
      */
-    protected readonly playerMap: Map<R, Player> = new Map()
+    protected readonly playerMap: Map<Role, Player> = new Map()
 
     /**
      * The status of this game.
@@ -51,13 +50,13 @@ export class Game<
      * Callback function fired when the game stops.
      * @protected
      */
-    protected stopCallback?: StopCallback<Role>
+    protected stopCallback?: StopCallback
 
     /**
      * The role whose timer stops due to time up.
      * @protected
      */
-    protected timeUpRole ?: R
+    protected timeUpRole ?: Role
 
     /**
      * Creates a game.
@@ -66,34 +65,33 @@ export class Game<
      * @param playerClass The player class.
      */
     constructor(
-        protected readonly roleList: R[],
+        protected readonly roleList: Role[],
         protected readonly timeControl: TimeControl<P>,
-        protected readonly playerClass: PlayerClass,
+        protected readonly playerClass: PlayerClass<P>,
     ) {
+        // Create game settings
+        this.gameSettings = new GameSettings<P, A, M>(this)
+
         // Initialize players
         this.playerMap = new Map()
         roleList.forEach(role => {
-            // @ts-ignore
             const player = new playerClass(this, role)
             this.playerMap.set(role, player)
         })
-
-        // Create game settings
-        this.gameSettings = new GameSettings<R, P, A, M>(this)
     }
 
     /**
      * Sets the stop callback function.
      * @param stopCallback Callback function fired when the game stops.
      */
-    set onStop(stopCallback: StopCallback<Role>) {
+    set onStop(stopCallback: StopCallback) {
         this.stopCallback = stopCallback
     }
 
     /**
      * Returns the role array.
      */
-    getRoleList(): R[] {
+    getRoleList(): Role[] {
         return this.roleList
     }
 
@@ -106,7 +104,7 @@ export class Game<
      * @param role The role of the index.
      * @throws Error if the role does not exist.
      */
-    getRoleIndex(role: R): number {
+    getRoleIndex(role: Role): number {
         const index = this.roleList.indexOf(role)
         if (index === -1) {
             throw new Error('The role does not exist.')
@@ -119,7 +117,7 @@ export class Game<
      * Returns a player by specified role.
      * @param role The role of the specified player.
      */
-    getPlayer(role: R): Player {
+    getPlayer(role: Role): Player {
         return this.playerMap.get(role)!
     }
 
@@ -127,7 +125,7 @@ export class Game<
      * Returns the index of the next role.
      * @param role The current role.
      */
-    getNextIndex(role: R): number {
+    getNextIndex(role: Role): number {
         return (this.getRoleIndex(role) + 1) % this.roleList.length
     }
 
@@ -135,7 +133,7 @@ export class Game<
      * Returns the next role.
      * @param role The current role.
      */
-    getNextRole(role: R): R {
+    getNextRole(role: Role): Role {
         return this.roleList[this.getNextIndex(role)]
     }
 
@@ -143,7 +141,7 @@ export class Game<
      * Returns the next player.
      * @param role
      */
-    getNextPlayer(role: R): Player {
+    getNextPlayer(role: Role): Player {
         return this.getPlayer(this.getNextRole(role))
     }
 
@@ -178,7 +176,7 @@ export class Game<
      * @param stopperRole The role of the player who stops the game
      * @param timeUpRole The role of the player whose time has been run out
      */
-    stop(stopperRole?: R | undefined, timeUpRole?: R | undefined): void {
+    stop(stopperRole?: Role | undefined, timeUpRole?: Role | undefined): void {
         this.gameStatus = GameStatus.STOPPED
 
         this.timeUpRole = timeUpRole
@@ -199,14 +197,14 @@ export class Game<
     /**
      * Returns time up role.
      */
-    getTimeUpRole(): R | undefined {
+    getTimeUpRole(): Role | undefined {
         return this.timeUpRole
     }
 
     /**
      * Returns game settings.
      */
-    getGameSettings(): GameSettings<R, P, A, M> {
+    getGameSettings(): GameSettings<P, A, M> {
         return this.gameSettings
     }
 

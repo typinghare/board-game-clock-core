@@ -4,24 +4,25 @@ import { PlayerSettings, SettingMetadata } from './GameSettings'
 
 export class TimeControl<
     P extends PlayerSettings = PlayerSettings,
+    M extends SettingMetadata = SettingMetadata
 > {
     /**
      * Initializes player settings.
      */
-    initializePlayerSettings(): DataCollection<P> {
-        return new DataCollection<P>({
+    initializePlayerSettings(): DataCollection<P, M> {
+        return new DataCollection<P, M>({
             main: new Datum<PlayerSettings['main'], SettingMetadata>(SlowHourMinuteSecond.ofMinutes(10), {
                 type: 'time',
                 label: 'Main',
                 description: 'The main time.',
             }),
-        } as DataMapping<P>)
+        } as DataMapping<P, M>)
     }
 
     /**
      * Set displayed player settings.
      */
-    setDisplayedPlayerSettings(): (keyof P)[] {
+    setDisplayedPlayerSettings(): string[] {
         return ['main']
     }
 }

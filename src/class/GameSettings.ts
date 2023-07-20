@@ -45,7 +45,6 @@ export type SettingMetadata = {
  * Game settings.
  */
 export class GameSettings<
-    R extends Role = Role,
     P extends PlayerSettings = PlayerSettings,
     A extends AdvancedSettings = AdvancedSettings,
     M extends SettingMetadata = SettingMetadata
@@ -54,69 +53,69 @@ export class GameSettings<
      * Player role => player settings.
      * @private
      */
-    private readonly playerSettings: Map<R, DataCollection<P>> = new Map()
+    private readonly playerSettings: Map<Role, DataCollection<P, M>> = new Map()
 
     /**
      * Advanced game settings.
      * @private
      */
-    private readonly advancedSettings: DataCollection<A>
+    private readonly advancedSettings: DataCollection<A, M>
 
     /**
      * Player settings to displayed.
      * @private
      */
-    private readonly displayedPlayerSettings: (keyof P)[]
+    private readonly displayedPlayerSettings: string[]
 
     /**
      * Advanced game settings to displayed.
      * @private
      */
-    private readonly displayedAdvancedSettings: (keyof A)[]
+    private readonly displayedAdvancedSettings: string[]
 
     /**
      * Creates a settings.
      */
     constructor(
-        game: Game<R, P, A, M>,
+        game: Game<P, A, M>,
     ) {
         // Initialize player settings
-        const roleList: R[] = game.getRoleList()
+        const roleList: Role[] = game.getRoleList()
         const timeControl = game.getTimeControl()
         roleList.forEach(role => this.playerSettings.set(role, timeControl.initializePlayerSettings()))
         this.displayedPlayerSettings = timeControl.setDisplayedPlayerSettings()
 
         // Initialize advanced settings
         this.advancedSettings = game.initializeAdvancedSettings()
-        this.displayedAdvancedSettings = [] as (keyof A)[]
+        this.displayedAdvancedSettings = [] as string[]
     }
 
     /**
      * Returns a specified player's settings.
      * @param role The role of the player.
      */
-    getPlayerSettings(role: R): DataCollection<P> {
+    getPlayerSettings(role: Role): DataCollection<P, M> {
         return this.playerSettings.get(role)!
     }
 
     /**
      * Returns advanced game settings.
      */
-    getAdvancedSettings(): DataCollection<A> {
+    getAdvancedSettings(): DataCollection<A, M> {
         return this.advancedSettings
     }
 
     /**
      * Returns player settings to display.
      */
-    getDisplayedPlayerSettings(): (keyof P)[] {
+    getDisplayedPlayerSettings(): string[] {
         return this.displayedPlayerSettings
     }
 
     /**
      * Returns advanced game settings to display.
      */
-    getDisplayedAdvancedSettings(): (keyof A)[] {
+    getDisplayedAdvancedSettings(): string[] {
         return this.displayedAdvancedSettings
     }
 }

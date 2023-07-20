@@ -135,7 +135,7 @@ export class Timer {
     /**
      * Returns the reference of the internal time variable.
      */
-    protected getTimePrototype(): HourMinuteSecond {
+    getTimePrototype(): HourMinuteSecond {
         return this.internalTime
     }
 

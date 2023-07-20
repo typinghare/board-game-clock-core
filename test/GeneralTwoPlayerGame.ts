@@ -15,7 +15,7 @@ playerA.getSettings().getDatum('enableByoyomi').value = true
 playerB.getSettings().getDatum('enableByoyomi').value = true
 playerA.getSettings().getDatum('byoyomiTimePerPeriod').value = SlowHourMinuteSecond.ofSeconds(10)
 playerB.getSettings().getDatum('byoyomiTimePerPeriod').value = SlowHourMinuteSecond.ofSeconds(10)
-playerB.getSettings().getDatum('byoyomiExtraTime').value = SlowHourMinuteSecond.ofSeconds(10)
+playerA.getSettings().getDatum('byoyomiExtraTime').value = SlowHourMinuteSecond.ofSeconds(10)
 playerB.getSettings().getDatum('byoyomiExtraTime').value = SlowHourMinuteSecond.ofSeconds(10)
 
 const simulator = new Simulator(generalTwoPlayerGame)

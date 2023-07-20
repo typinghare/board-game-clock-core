@@ -108,8 +108,15 @@ export class GeneralTwoPlayerGameTimeControl extends TimeControl<TwoPlayerGamePl
     override setDisplayedPlayerSettings(): string[] {
         return [
             'main',
+
+            'enableTimeBonus',
             'timeBonusBasedTurnTime',
             'timeBonus',
+
+            'enableByoyomi',
+            'byoyomiTimePerPeriod',
+            'byoyomiPeriods',
+            'byoyomiExtraTime',
         ]
     }
 }
@@ -175,7 +182,8 @@ export class GeneralTwoPlayerGameTimerController extends TimerController<TwoPlay
                     if (timerController.remainingPeriods) {
                         if (timerController.remainingPeriods > 1) {
                             timerController.remainingPeriods!--
-                            this.time = byoyomiTimePerPeriod.extend(byoyomiExtraTime.ms)
+                            this.time = byoyomiTimePerPeriod.clone().extend(byoyomiExtraTime.ms)
+
                             return this.resume()
                         }
                     }
